@@ -13,28 +13,42 @@ const resolvers: Resolvers = {
             { relations: ["places"] }
           );
           if (user) {
+            const tempPlaces = user.places as any;
+            const favPlaces: any = [];
+            const notFavPlaces: any = [];
+            tempPlaces.forEach((place) => {
+              if (place.isFav) {
+                favPlaces.push(place);
+              } else {
+                notFavPlaces.push(place);
+              }
+            });
+            const sort = (a, b) => a.id - b.id;
+            favPlaces.sort(sort);
+            notFavPlaces.sort(sort);
+            const places = favPlaces.concat(notFavPlaces);
             return {
               ok: true,
-              places: user.places as any,
-              error: null
+              places: places,
+              error: null,
             };
           } else {
-              return {
-                  ok: false,
-                  error: "user not found",
-                  places: null
-              }
+            return {
+              ok: false,
+              error: "user not found",
+              places: null,
+            };
           }
         } catch (error) {
           return {
             ok: false,
             error: error.message,
-            places: null
+            places: null,
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;
