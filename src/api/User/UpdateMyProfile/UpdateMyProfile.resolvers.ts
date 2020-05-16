@@ -23,7 +23,14 @@ const resolvers: Resolvers = {
           delete notNull.password;
         }
         try {
-          await User.update({ id: user.id }, { ...notNull });
+          // await User.update({ id: user.id }, { ...notNull });
+          // api 다시
+          user.firstName = notNull.firstName;
+          user.lastName = notNull.lastName;
+          user.email = notNull.email;
+          user.profilePhoto = notNull.profilePhoto;
+          user.save();
+          
           return {
             ok: true,
             error: null
