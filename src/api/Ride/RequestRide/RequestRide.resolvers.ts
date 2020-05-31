@@ -2,7 +2,7 @@ import { Resolvers } from "../../../types/resolvers";
 import privateResolver from "../../../utils/privateResolver";
 import {
   RequestRideMutationArgs,
-  RequestRideResponse
+  RequestRideResponse,
 } from "../../../types/graph";
 import User from "../../../entities/User";
 import Ride from "../../../entities/Ride";
@@ -20,7 +20,7 @@ const resolvers: Resolvers = {
           try {
             const ride = (await Ride.create({
               ...args,
-              passenger: user
+              passenger: user,
             }).save()) as any;
             pubSub.publish("rideRequest", { NearbyRideSubscription: ride });
             user.isRiding = true;
@@ -28,25 +28,25 @@ const resolvers: Resolvers = {
             return {
               ok: true,
               error: null,
-              ride
+              ride,
             };
           } catch (error) {
             return {
               ok: false,
               error: error.message,
-              ride: null
+              ride: null,
             };
           }
         } else {
           return {
             ok: false,
             error: "You can't request two rides or drive and request",
-            ride: null
+            ride: null,
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;
