@@ -63,6 +63,7 @@ type Message {
   text: String!
   chatId: Int
   chat: Chat!
+  userId: Int
   user: User!
   createdAt: String!
   updatedAt: String
@@ -133,9 +134,9 @@ type Ride {
   distance: String!
   duration: String!
   driverId: Int
-  driver: User!
-  passengerId: Int!
-  passenger: User!
+  driver: User
+  passengerId: Int
+  passenger: User
   chatId: Int
   chat: Chat
   createAt: String!
