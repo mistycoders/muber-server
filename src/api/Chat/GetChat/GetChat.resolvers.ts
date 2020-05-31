@@ -12,41 +12,43 @@ const resolvers: Resolvers = {
         try {
           const chat = (await Chat.findOne(
             {
-              id: args.chatId
+              id: args.chatId,
             },
             { relations: ["messages"] }
-          )) as any;
+          ).catch((err) => {
+            console.log(err);
+          })) as any;
           if (chat) {
             if (chat.passengerId === user.id || chat.driverId === user.id) {
               return {
                 ok: true,
                 error: null,
-                chat
+                chat,
               };
             } else {
               return {
                 ok: false,
                 error: "Not authorized to see this chat",
-                chat: null
+                chat: null,
               };
             }
           } else {
             return {
               ok: false,
               error: "Not found",
-              chat: null
+              chat: null,
             };
           }
         } catch (error) {
           return {
             ok: false,
             error: error.message,
-            chat: null
+            chat: null,
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;

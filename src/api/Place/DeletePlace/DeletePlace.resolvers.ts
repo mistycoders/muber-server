@@ -1,6 +1,9 @@
 import { Resolvers } from "../../../types/resolvers";
 import privateResolver from "../../../utils/privateResolver";
-import { DeletePlaceMutationArgs, DeletePlaceResponse } from "../../../types/graph";
+import {
+  DeletePlaceMutationArgs,
+  DeletePlaceResponse,
+} from "../../../types/graph";
 import User from "../../../entities/User";
 import Place from "../../../entities/Place";
 
@@ -12,39 +15,41 @@ const resolvers: Resolvers = {
         args: DeletePlaceMutationArgs,
         { req }
       ): Promise<DeletePlaceResponse> => {
-          const user: User = req.user;
-          try {
-              const place = await Place.findOne({
-                  id: args.placeId
-              })
-              if(place) {
-                if(place.userId === user.id) {
-                    place.remove();
-                    return {
-                        ok: true,
-                        error: null
-                    }
-                } else {
-                    return {
-                        ok: false,
-                        error: "Not Authorized"
-                    }
-                }
-              } else {
-                  return {
-                      ok: false,
-                      error: "Place not found"
-                  }
-              }
-          } catch (error) {
+        const user: User = req.user;
+        try {
+          const place = await Place.findOne({
+            id: args.placeId,
+          }).catch((err) => {
+            console.log(err);
+          });
+          if (place) {
+            if (place.userId === user.id) {
+              place.remove();
               return {
-                  ok: false,
-                  error: error.message
-              }
+                ok: true,
+                error: null,
+              };
+            } else {
+              return {
+                ok: false,
+                error: "Not Authorized",
+              };
+            }
+          } else {
+            return {
+              ok: false,
+              error: "Place not found",
+            };
           }
+        } catch (error) {
+          return {
+            ok: false,
+            error: error.message,
+          };
+        }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;

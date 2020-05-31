@@ -15,7 +15,9 @@ const resolvers: Resolvers = {
               id: args.rideId,
             },
             { relations: ["passenger", "driver"] }
-          )) as any;
+          ).catch((err) => {
+            console.log(err);
+          })) as any;
           if (ride) {
             if (ride.passengerId === user.id || ride.driverId === user.id) {
               return {

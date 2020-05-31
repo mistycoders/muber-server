@@ -9,14 +9,16 @@ const resolvers: Resolvers = {
       async (_, __, { req }): Promise<ToggleDrivingModeResponse> => {
         const user: User = req.user;
         user.isDriving = !user.isDriving;
-        user.save();
+        user.save().catch((err) => {
+          console.log(err);
+        });
         return {
           ok: true,
-          error: null
+          error: null,
         };
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;

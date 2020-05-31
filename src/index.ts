@@ -21,7 +21,10 @@ const appOptions: Options = {
     onConnect: async connectionParams => {
       const token = connectionParams["X-JWT"];
       if (token) {
-        const user = await decodeJWT(token);
+        const user = await decodeJWT(token)
+        .catch(err => {
+          console.log(err);
+        });
         if (user) {
           return { currentUser: user };
         }

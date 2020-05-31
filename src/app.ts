@@ -38,7 +38,10 @@ class App {
   ): Promise<void> => {
     const token = req.get("X-JWT");
     if (token) {
-      const user = await decodeJWT(token);
+      const user = await decodeJWT(token)
+      .catch(err => {
+        console.log(err);
+      });
       if (user) {
         req.user = user;
       } else {

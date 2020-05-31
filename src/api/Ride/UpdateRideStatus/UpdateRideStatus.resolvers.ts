@@ -20,8 +20,7 @@ const resolvers: Resolvers = {
         if (user.isDriving) {
           console.log("user :", user, args);
           try {
-            let ride: Ride | undefined;
-            // console.log(args);
+            let ride: Ride | undefined | void;
             if (args.status === "ACCEPTED") {
               ride = await Ride.findOne(
                 {
@@ -29,18 +28,27 @@ const resolvers: Resolvers = {
                   status: "REQUESTING",
                 },
                 { relations: ["passenger", "driver"] }
-              );
-              // console.log(ride);
+              ).catch((err) => {
+                console.log(err);
+              });
               if (ride) {
                 ride.driver = user;
                 user.isTaken = true;
-                user.save();
+                user.save().catch((err) => {
+                  console.log(err);
+                });
                 const chat = await Chat.create({
                   driver: user,
                   passenger: ride.passenger,
-                }).save();
+                })
+                  .save()
+                  .catch((err) => {
+                    console.log(err);
+                  });
                 ride.chat = chat as any;
-                ride.save();
+                ride.save().catch((err) => {
+                  console.log(err);
+                });
               }
             } else {
               ride = await Ride.findOne(
@@ -49,17 +57,25 @@ const resolvers: Resolvers = {
                   driver: user,
                 },
                 { relations: ["passenger", "driver"] }
-              );
+              ).catch((err) => {
+                console.log(err);
+              });
             }
             if (ride) {
               ride.status = args.status;
-              ride.save();
+              ride.save().catch((err) => {
+                console.log(err);
+              });
               if (args.status === "FINISHED") {
                 user.isTaken = false;
-                await user.save();
+                await user.save().catch((err) => {
+                  console.log(err);
+                });
                 const passenger: User = ride.passenger;
                 passenger.isRiding = false;
-                await passenger.save();
+                await passenger.save().catch((err) => {
+                  console.log(err);
+                });
               }
               pubSub.publish("rideUpdate", { RideStatusSubscription: ride });
               return {

@@ -16,18 +16,24 @@ const resolvers: Resolvers = {
         const user: User = req.user;
         try {
           const place = await Place.findOne({
-            id: args.placeId
+            id: args.placeId,
+          }).catch((err) => {
+            console.log(err);
           });
           if (place) {
             if (place.userId === user.id) {
               const notNull = cleanNullArgs(args);
-              if(notNull.placeId !== null) {
+              if (notNull.placeId !== null) {
                 delete notNull.placeId;
               }
-              await Place.update({ id: args.placeId }, { ...notNull });
+              await Place.update({ id: args.placeId }, { ...notNull }).catch(
+                (err) => {
+                  console.log(err);
+                }
+              );
               return {
                 ok: true,
-                error: null
+                error: null,
               };
             } else {
               return { ok: false, error: "Not Authorized" };
@@ -35,18 +41,18 @@ const resolvers: Resolvers = {
           } else {
             return {
               ok: false,
-              error: "Place not found"
+              error: "Place not found",
             };
           }
         } catch (error) {
           return {
             ok: false,
-            error: error.message
+            error: error.message,
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;

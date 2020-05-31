@@ -13,39 +13,56 @@ const resolvers: Resolvers = {
         if (user.email && !user.verifiedEmail) {
           try {
             const oldVerification = await Verification.findOne({
-              payload: user.email
+              payload: user.email,
+            }).catch((err) => {
+              console.log(err);
             });
             if (oldVerification) {
-              oldVerification.remove();
+              oldVerification.remove().catch((err) => {
+                console.log(err);
+              });
             }
             const newVerification = await Verification.create({
               payload: user.email,
-              target: "EMAIL"
-            }).save();
-            await sendVerificationEmail(
-              user.email,
-              user.fullName,
-              newVerification.key
-            );
-            return {
-              ok: true,
-              error: null
-            };
+              target: "EMAIL",
+            })
+              .save()
+              .catch((err) => {
+                console.log(err);
+              });
+            if (newVerification) {
+              await sendVerificationEmail(
+                user.email,
+                user.fullName,
+                newVerification.key
+              ).catch((err) => {
+                console.log(err);
+              });
+              return {
+                ok: true,
+                error: null,
+              };
+            } else {
+              return {
+                ok: false,
+                error: "Unexpected error",
+              };
+            }
           } catch (error) {
             return {
               ok: false,
-              error: error.message
+              error: error.message,
             };
           }
         } else {
           return {
             ok: false,
-            error: "Your user has no email to verify"
+            error: "Your user has no email to verify",
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;

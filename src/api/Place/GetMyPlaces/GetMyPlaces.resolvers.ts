@@ -11,7 +11,9 @@ const resolvers: Resolvers = {
           const user = await User.findOne(
             { id: req.user.id },
             { relations: ["places"] }
-          );
+          ).catch((err) => {
+            console.log(err);
+          });
           if (user) {
             const tempPlaces = user.places as any;
             const favPlaces: any = [];

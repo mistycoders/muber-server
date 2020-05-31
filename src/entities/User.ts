@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  OneToMany
+  OneToMany,
 } from "typeorm";
 import Chat from "./Chat";
 import Message from "./Message";
@@ -72,40 +72,22 @@ class User extends BaseEntity {
   @Column({ type: "text", nullable: true })
   fbId: string;
 
-  @OneToMany(
-    type => Chat,
-    chat => chat.passenger
-  )
+  @OneToMany((type) => Chat, (chat) => chat.passenger)
   chatsAsPassenger: Ride[];
 
-  @OneToMany(
-    type => Chat,
-    chat => chat.driver
-  )
+  @OneToMany((type) => Chat, (chat) => chat.driver)
   chatsAsDriver: Ride[];
 
-  @OneToMany(
-    type => Message,
-    message => message.user
-  )
+  @OneToMany((type) => Message, (message) => message.user)
   messages: Message[];
 
-  @OneToMany(
-    type => Ride,
-    ride => ride.passenger
-  )
+  @OneToMany((type) => Ride, (ride) => ride.passenger)
   ridesAsPassenger: Ride[];
 
-  @OneToMany(
-    type => Ride,
-    ride => ride.driver
-  )
+  @OneToMany((type) => Ride, (ride) => ride.driver)
   ridesAsDriver: Ride[];
 
-  @OneToMany(
-    type => Place,
-    place => place.user
-  )
+  @OneToMany((type) => Place, (place) => place.user)
   places: Place[];
 
   @CreateDateColumn()
@@ -126,13 +108,23 @@ class User extends BaseEntity {
   @BeforeUpdate()
   async savePassword(): Promise<void> {
     if (this.password) {
-      const hashedPassword = await this.hashPassword(this.password);
-      this.password = hashedPassword;
+      const hashedPassword = await this.hashPassword(this.password).catch(
+        (err) => {
+          console.log(err);
+        }
+      );
+      if (hashedPassword) {
+        this.password = hashedPassword;
+      }
     }
   }
 
   private hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, BCRYPT_ROUNDS);
+    const hashedPassword = bcrypt.hash(password, BCRYPT_ROUNDS).catch((err) => {
+      console.log(err);
+      return password;
+    });
+    return hashedPassword;
   }
 }
 

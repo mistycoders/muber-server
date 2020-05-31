@@ -3,7 +3,7 @@ import privateResolver from "../../../utils/privateResolver";
 import User from "../../../entities/User";
 import {
   CompleteEmailVerificationResponse,
-  CompleteEmailVerificationMutationArgs
+  CompleteEmailVerificationMutationArgs,
 } from "../../../types/graph";
 import Verification from "../../../entities/Verification";
 
@@ -21,36 +21,40 @@ const resolvers: Resolvers = {
           try {
             const verification = await Verification.findOne({
               key,
-              payload: user.email
+              payload: user.email,
+            }).catch((err) => {
+              console.log(err);
             });
             if (verification) {
               user.verifiedEmail = true;
-              user.save();
+              user.save().catch((err) => {
+                console.log(err);
+              });
               return {
                 ok: true,
-                error: null
+                error: null,
               };
             } else {
               return {
                 ok: false,
-                error: "Can't verify email"
+                error: "Can't verify email",
               };
             }
           } catch (error) {
             return {
               ok: false,
-              error: error.message
+              error: error.message,
             };
           }
         } else {
           return {
             ok: false,
-            error: "No email to verify"
+            error: "No email to verify",
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;

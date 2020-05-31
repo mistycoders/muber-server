@@ -21,10 +21,16 @@ const resolvers: Resolvers = {
             const ride = (await Ride.create({
               ...args,
               passenger: user,
-            }).save()) as any;
+            })
+              .save()
+              .catch((err) => {
+                console.log(err);
+              })) as any;
             pubSub.publish("rideRequest", { NearbyRideSubscription: ride });
             user.isRiding = true;
-            user.save();
+            user.save().catch((err) => {
+              console.log(err);
+            });
             return {
               ok: true,
               error: null,

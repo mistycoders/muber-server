@@ -2,7 +2,7 @@ import { Resolvers } from "../../../types/resolvers";
 import privateResolver from "../../../utils/privateResolver";
 import {
   SendChatMessageMutationArgs,
-  SendChatMessageResponse
+  SendChatMessageResponse,
 } from "../../../types/graph";
 import User from "../../../entities/User";
 import Message from "../../../entities/Message";
@@ -19,47 +19,53 @@ const resolvers: Resolvers = {
         const user: User = req.user;
         try {
           const chat = await Chat.findOne({
-            id: args.chatId
+            id: args.chatId,
+          }).catch((err) => {
+            console.log(err);
           });
           if (chat) {
             if (chat.passengerId === user.id || chat.driverId === user.id) {
               const message: any = await Message.create({
                 text: args.text,
                 chat,
-                user
-              }).save();
+                user,
+              })
+                .save()
+                .catch((err) => {
+                  console.log(err);
+                });
               pubSub.publish("newChatMessage", {
-                MessageSubscription: message
+                MessageSubscription: message,
               });
               return {
                 ok: true,
                 error: null,
-                message
+                message,
               };
             } else {
               return {
                 ok: false,
                 error: "Unauthorized",
-                message: null
+                message: null,
               };
             }
           } else {
             return {
               ok: false,
               error: "Chat not found",
-              message: null
+              message: null,
             };
           }
         } catch (error) {
           return {
             ok: false,
             error: error.message,
-            message: null
+            message: null,
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;

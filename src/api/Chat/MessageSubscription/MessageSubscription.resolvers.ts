@@ -10,11 +10,13 @@ const resolvers = {
         async (payload, _, { context }) => {
           const user: User = context.currentUser;
           const {
-            MessageSubscription: { chatId }
+            MessageSubscription: { chatId },
           } = payload;
           try {
             const chat = await Chat.findOne({
-              id: chatId
+              id: chatId,
+            }).catch((err) => {
+              console.log(err);
             });
             if (chat) {
               return chat.driverId === user.id || chat.passengerId === user.id;
@@ -25,9 +27,9 @@ const resolvers = {
             return false;
           }
         }
-      )
-    }
-  }
+      ),
+    },
+  },
 };
 
 export default resolvers;
