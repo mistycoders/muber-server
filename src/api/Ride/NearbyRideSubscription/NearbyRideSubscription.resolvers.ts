@@ -9,19 +9,19 @@ const resolvers = {
         (payload, _, { context }) => {
           const user: User = context.currentUser;
           const {
-            NearbyRideSubscription: { pickupLat, pickupLng }
+            NearbyRideSubscription: { pickUpLat, pickUpLng },
           } = payload;
           const { lastLat: userLastLat, lastLng: userLastLng } = user;
           return (
-            pickupLat >= userLastLat - 0.05 &&
-            pickupLat <= userLastLat + 0.05 &&
-            pickupLng >= userLastLng - 0.05 &&
-            pickupLng <= userLastLng + 0.05
+            pickUpLat >= userLastLat - 0.05 &&
+            pickUpLat <= userLastLat + 0.05 &&
+            pickUpLng >= userLastLng - 0.05 &&
+            pickUpLng <= userLastLng + 0.05
           );
         }
-      )
-    }
-  }
+      ),
+    },
+  },
 };
 
 export default resolvers;
