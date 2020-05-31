@@ -7,7 +7,7 @@ import connectionOptions from "./ormConfig";
 import app from "./app";
 import decodeJWT from "./utils/decodeJWT";
 
-const PORT: number | string = process.env.PORT || 4000;
+const PORT: string = process.env.PORT as string;
 const PLAYGROUND_ENDPOINT: string = "/playground";
 const GRAPHQL_ENDPOINT: string = "/graphql";
 const SUBSCRIPTION_ENDPOINT: string = "/subscription";
