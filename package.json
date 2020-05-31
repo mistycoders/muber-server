@@ -32,7 +32,7 @@
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "postbuild": "cd src && copy ./api/**/*.graphql ../dist/api",
-    "start": "cd dist && node --unhandled-rejections=warn ."
+    "start": "cd dist && node --unhandled-rejections=none ."
   },
   "dependencies": {
     "bcrypt": "^3.0.7",
