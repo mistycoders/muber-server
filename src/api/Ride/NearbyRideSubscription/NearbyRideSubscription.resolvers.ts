@@ -5,7 +5,10 @@ const resolvers = {
   Subscription: {
     NearbyRideSubscription: {
       subscribe: withFilter(
-        (_, __, { pubSub }) => pubSub.asyncIterator("rideRequest"),
+        (_, __, { pubSub }) =>
+          pubSub.asyncIterator("rideRequest").catch((err) => {
+            console.log(err);
+          }),
         (payload, _, { context }) => {
           const user: User = context.currentUser;
           const {

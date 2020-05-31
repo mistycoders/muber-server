@@ -5,14 +5,17 @@ const resolvers = {
   Subscription: {
     DriversSubscription: {
       subscribe: withFilter(
-        (_, __, { pubSub }) => pubSub.asyncIterator("driverUpdate"),
+        (_, __, { pubSub }) =>
+          pubSub.asyncIterator("driverUpdate").catch((err) => {
+            console.log(err);
+          }),
         (payload, _, { context }) => {
           const user: User = context.currentUser;
           const {
             DriversSubscription: {
               lastLat: driverLastLat,
-              lastLng: driverLastLng
-            }
+              lastLng: driverLastLng,
+            },
           } = payload;
           const { lastLat: userLastLat, lastLng: userLastLng } = user;
           return (
@@ -22,9 +25,9 @@ const resolvers = {
             driverLastLng <= userLastLng + 0.05
           );
         }
-      )
-    }
-  }
+      ),
+    },
+  },
 };
 
 export default resolvers;
