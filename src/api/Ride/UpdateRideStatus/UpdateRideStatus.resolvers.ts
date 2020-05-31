@@ -2,7 +2,7 @@ import { Resolvers } from "../../../types/resolvers";
 import privateResolver from "../../../utils/privateResolver";
 import {
   UpdateRideStatusMutationArgs,
-  UpdateRideStatusResponse
+  UpdateRideStatusResponse,
 } from "../../../types/graph";
 import User from "../../../entities/User";
 import Ride from "../../../entities/Ride";
@@ -18,62 +18,75 @@ const resolvers: Resolvers = {
       ): Promise<UpdateRideStatusResponse> => {
         const user: User = req.user;
         if (user.isDriving) {
+          console.log("user :", user, args);
           try {
             let ride: Ride | undefined;
+            // console.log(args);
             if (args.status === "ACCEPTED") {
               ride = await Ride.findOne(
                 {
                   id: args.rideId,
-                  status: "REQUESTING"
+                  status: "REQUESTING",
                 },
-                { relations: ["passenger"] }
+                { relations: ["passenger", "driver"] }
               );
+              // console.log(ride);
               if (ride) {
                 ride.driver = user;
                 user.isTaken = true;
                 user.save();
-                const chat = ((await Chat.create({
+                const chat = await Chat.create({
                   driver: user,
-                  passenger: ride.passenger
-                }))).save();
+                  passenger: ride.passenger,
+                }).save();
                 ride.chat = chat as any;
                 ride.save();
               }
             } else {
-              ride = await Ride.findOne({
-                id: args.rideId,
-                driver: user
-              });
+              ride = await Ride.findOne(
+                {
+                  id: args.rideId,
+                  driver: user,
+                },
+                { relations: ["passenger", "driver"] }
+              );
             }
             if (ride) {
               ride.status = args.status;
               ride.save();
+              if (args.status === "FINISHED") {
+                user.isTaken = false;
+                await user.save();
+                const passenger: User = ride.passenger;
+                passenger.isRiding = false;
+                await passenger.save();
+              }
               pubSub.publish("rideUpdate", { RideStatusSubscription: ride });
               return {
                 ok: true,
-                error: null
+                error: null,
               };
             } else {
               return {
                 ok: false,
-                error: "Can't update ride"
+                error: "Can't update ride",
               };
             }
           } catch (error) {
             return {
               ok: false,
-              error: error.message
+              error: error.message,
             };
           }
         } else {
           return {
             ok: false,
-            error: "You are not driving"
+            error: "You are not driving",
           };
         }
       }
-    )
-  }
+    ),
+  },
 };
 
 export default resolvers;
